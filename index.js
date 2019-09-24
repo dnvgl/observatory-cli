@@ -91,6 +91,10 @@ var FORMATS = {
     "description": "plain-text tabular format",
     "action": formatAnswersCsv
   },
+  "jsonreport": {
+    "description": "plain-text json format",
+    "action": formatAnswersJSONReport
+  },
   "csv": {
     "description": util.format("alias for %s", f.code("report")),
     "action": formatAnswersCsv
@@ -224,6 +228,49 @@ function promiseReport(scan, options) {
   }).then(function(reportData) {
     return formatAnswer(reportData, url, scan, options);
   });
+}
+
+function formatAnswersJSONReport(scores, url, scan, options) {
+
+  function sortByScore(a, b) {
+    return a.score_modifier - b.score_modifier;
+  }
+
+  var scoresList = [];
+  for (var k in scores) {
+    scoresList.push(scores[k]);
+  }
+
+  // sort and invert to positive
+  scoresList.sort(sortByScore);
+
+  var detailedArray = [];
+
+  //loop through the score list
+  scoresList.map(function(score) {
+    var detailedObject = {
+          "score": score.score_modifier,
+          "rule": score.name.trim(),
+          "description":  score.score_description.trim() 
+    };
+    //push object to array
+    detailedArray.push(detailedObject);
+  });
+
+  var fullReportUrl = "https://observatory.mozilla.org/analyze.html?host=" + options.site;
+  var hostObject = {
+    "host": options.site,
+    "score": scan.score,
+    "grade": scan.grade,
+    "fullReport": fullReportUrl,
+    "details": detailedArray
+  };
+  //push object to array
+  var jsonOutput = [];
+  jsonOutput.push(hostObject);
+
+  //output the array as JSON
+  console.log(JSON.stringify(jsonOutput, null ,2));
 }
 
 function formatAnswersCsv(scores, url, scan, options) {
