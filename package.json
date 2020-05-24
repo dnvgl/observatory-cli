@@ -16,7 +16,8 @@
     "request": "^2.74.0",
     "request-promise": "^4.1.1",
     "sprintf-js": "^1.0.3",
-    "timeout-as-promise": "^1.0.0"
+    "timeout-as-promise": "^1.0.0",
+    "snyk": "^1.324.0"
   },
   "devDependencies": {
     "depcheck": "^0.6.4",
@@ -48,8 +49,10 @@
     "lint:eslint": "eslint .",
     "lint:fixpack": "fixpack",
     "lint:nsp": "nsp check -o summary",
-    "prepublish": "npm shrinkwrap",
+    "prepublish": "npm run snyk-protect && npm shrinkwrap",
     "pretest": "npm run lint",
-    "test": "echo OK"
-  }
+    "test": "echo OK",
+    "snyk-protect": "snyk protect"
+  },
+  "snyk": true
 }
